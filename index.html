@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praince X panel | Official Links</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        
+        .animated-bg {
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #000000);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .float-anim { animation: float 6s ease-in-out infinite; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .social-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: 0.5s;
+        }
+
+        .social-btn:hover::after { left: 100%; }
+
+        .btn-tiktok:hover { box-shadow: 0 0 20px rgba(255, 0, 80, 0.4); border-color: rgba(255, 0, 80, 0.5); }
+        .btn-youtube:hover { box-shadow: 0 0 20px rgba(255, 0, 0, 0.4); border-color: rgba(255, 0, 0, 0.5); }
+        .btn-whatsapp:hover { box-shadow: 0 0 20px rgba(37, 211, 102, 0.4); border-color: rgba(37, 211, 102, 0.5); }
+
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top: 3px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0050, #ff0000, #25D366);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .completed {
+            opacity: 0.6;
+            pointer-events: none;
+            border-color: rgba(37, 211, 102, 0.5) !important;
+        }
+
+        .completed::before {
+            content: '✓';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #25D366;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .locked-banner {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2));
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .unlocked-banner {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.2));
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            50% { box-shadow: 0 0 20px 5px rgba(34, 197, 94, 0.2); }
+        }
+
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .admin-content {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .admin-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .admin-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .admin-btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .admin-btn-primary:hover { background: #2563eb; }
+
+        .admin-btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .admin-btn-success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .link-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-online {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .status-offline {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .admin-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .admin-toggle:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+        }
+
+        .sync-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 50;
+        }
+
+        .syncing {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            animation: pulse 1.5s infinite;
+        }
+
+        .synced {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="animated-bg min-h-screen flex items-center justify-center p-4 text-white">
+
+    <!-- Sync Indicator -->
+    <div id="syncIndicator" class="sync-indicator synced">
+        <i class="fa-solid fa-wifi mr-2"></i>Online
+    </div>
+
+    <!-- Admin Toggle Button -->
+    <button onclick="showAdminLogin()" class="admin-toggle" title="Admin Panel">
+        <i class="fa-solid fa-gear"></i>
+    </button>
+
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="glass-card rounded-2xl p-8 max-w-sm w-full mx-4 text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <h3 class="text-xl font-bold mb-2">Opening Link...</h3>
+            <p class="text-gray-400 text-sm mb-4">Visit the site and return to complete</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2" id="loadingText">0%</p>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="glass-card rounded-2xl p-8 max-w-sm w-full mx-4 text-center">
+            <div class="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-check text-3xl text-green-500"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Task Completed!</h3>
+            <p class="text-gray-400 text-sm mb-6">You returned successfully</p>
+            <button onclick="closeSuccessModal()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full font-semibold transition-colors">
+                Continue
+            </button>
+        </div>
+    </div>
+
+    <!-- Unlock Modal -->
+    <div id="unlockModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="glass-card rounded-2xl p-8 max-w-sm w-full mx-4 text-center">
+            <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-lock-open text-3xl text-blue-500"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">All Links Unlocked!</h3>
+            <p class="text-gray-400 text-sm mb-6">You can now access all your links</p>
+            <button onclick="closeUnlockModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full font-semibold transition-colors">
+                Open All Links
+            </button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-sm">
+        <div class="glass-card rounded-2xl p-8 max-w-sm w-full mx-4 text-center">
+            <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-lock text-3xl text-blue-500"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Admin Access</h3>
+            <input type="password" id="adminPassword" placeholder="Enter password" class="admin-input text-center">
+            <button onclick="verifyAdmin()" class="admin-btn admin-btn-primary w-full mt-4">
+                Login
+            </button>
+            <button onclick="closeAdminLogin()" class="text-gray-400 text-sm mt-4 hover:text-white">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel">
+        <div class="admin-content">
+            <div class="glass-card rounded-2xl p-6 mb-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold"><i class="fa-solid fa-shield-halved mr-2"></i>Admin Panel</h2>
+                    <button onclick="closeAdminPanel()" class="text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-2xl"></i>
+                    </button>
+                </div>
+
+                <!-- Firebase Status -->
+                <div class="mb-6 p-4 rounded-xl bg-white/5">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm text-gray-400">Firebase Status</span>
+                        <span id="firebaseStatus" class="link-status status-offline">
+                            <i class="fa-solid fa-circle text-[8px]"></i> Disconnected
+                        </span>
+                    </div>
+                    <button onclick="testConnection()" class="admin-btn admin-btn-primary text-sm">
+                        <i class="fa-solid fa-rotate mr-2"></i>Test Connection
+                    </button>
+                </div>
+
+                <!-- Link Management -->
+                <h3 class="text-lg font-semibold mb-4">Manage Links</h3>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="p-4 rounded-xl bg-white/5">
+                        <label class="text-sm text-gray-400 block mb-2">TikTok Link</label>
+                        <input type="url" id="adminTiktok" class="admin-input" placeholder="https://tiktok.com/...">
+                    </div>
+                    
+                    <div class="p-4 rounded-xl bg-white/5">
+                        <label class="text-sm text-gray-400 block mb-2">YouTube Link</label>
+                        <input type="url" id="adminYoutube" class="admin-input" placeholder="https://youtube.com/...">
+                    </div>
+                    
+                    <div class="p-4 rounded-xl bg-white/5">
+                        <label class="text-sm text-gray-400 block mb-2">WhatsApp Link</label>
+                        <input type="url" id="adminWhatsapp" class="admin-input" placeholder="https://whatsapp.com/...">
+                    </div>
+                    
+                    <div class="p-4 rounded-xl bg-white/5 border-2 border-blue-500/30">
+                        <label class="text-sm text-blue-400 block mb-2"><i class="fa-solid fa-star mr-2"></i>Special Reward Link (Unlocked After Tasks)</label>
+                        <input type="url" id="adminSpecial" class="admin-input" placeholder="https://...">
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="saveLinks()" class="admin-btn admin-btn-success flex-1">
+                        <i class="fa-solid fa-save mr-2"></i>Save to Firebase
+                    </button>
+                    <button onclick="loadLinks()" class="admin-btn admin-btn-primary flex-1">
+                        <i class="fa-solid fa-rotate mr-2"></i>Reload
+                    </button>
+                </div>
+
+                <!-- Analytics -->
+                <h3 class="text-lg font-semibold mb-4 mt-8">Analytics</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-white/5 text-center">
+                        <div class="text-2xl font-bold text-blue-400" id="totalVisits">0</div>
+                        <div class="text-xs text-gray-400">Total Visits</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-white/5 text-center">
+                        <div class="text-2xl font-bold text-green-400" id="completedTasks">0</div>
+                        <div class="text-xs text-gray-400">Tasks Completed</div>
+                    </div>
+                </div>
+
+                <!-- Reset Data -->
+                <button onclick="resetAllData()" class="admin-btn admin-btn-danger w-full mt-6">
+                    <i class="fa-solid fa-trash mr-2"></i>Reset All Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-md mx-auto">
+        
+        <!-- Progress Indicator -->
+        <div class="mb-6 text-center fade-in-up">
+            <div class="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full">
+                <span class="text-sm text-gray-400">Progress:</span>
+                <span id="progressCount" class="text-sm font-bold text-white">0/3</span>
+                <div class="w-20 h-2 bg-gray-700 rounded-full overflow-hidden">
+                    <div id="mainProgress" class="h-full bg-gradient-to-r from-pink-500 via-red-500 to-green-500 w-0 transition-all duration-500"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Header Image Section -->
+        <div class="relative w-full h-48 mb-[-3rem] z-0 fade-in-up">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a2e] z-10 rounded-b-[2rem]"></div>
+            <img 
+                src="https://i.supaimg.com/0e22cd69-bfbb-49e1-8bfa-145f30e72769/38dfa4db-377d-4d61-a835-9907365ee752.jpg" 
+                alt="Header Cover" 
+                class="w-full h-full object-cover rounded-b-[2rem] shadow-2xl"
+            >
+        </div>
+
+        <!-- Profile Card -->
+        <div class="glass-card rounded-[2rem] p-8 relative z-10 mx-2 fade-in-up delay-100 flex flex-col items-center text-center">
+            
+            <!-- Profile Picture -->
+            <div class="w-24 h-24 rounded-full border-4 border-[#1a1a2e] bg-gray-700 overflow-hidden mb-4 shadow-lg float-anim">
+                <img src="https://i.supaimg.com/0e22cd69-bfbb-49e1-8bfa-145f30e72769/daa74edd-c9ba-4979-83e5-9b883c28aae4.jpg" alt="Profile" class="w-full h-full object-cover">
+            </div>
+
+            <!-- Profile Name -->
+            <h1 class="text-3xl font-bold mb-1 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                Praince X Panel
+            </h1>
+            
+            <!-- Description -->
+            <p class="text-gray-400 text-sm font-medium mb-8">
+                FOLLOW AND SUBSCRIBE COMPLETE TASKS 👇
+            </p>
+
+            <!-- Social Links Grid -->
+            <div class="w-full space-y-4">
+
+                <!-- TikTok -->
+                <button onclick="handleLinkClick('tiktok')" id="btn-tiktok" class="social-btn btn-tiktok glass-card w-full flex items-center justify-between p-4 rounded-xl group hover:bg-white/5 fade-in-up delay-200 text-left">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center text-[#ff0050]">
+                            <i class="fa-brands fa-tiktok text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-semibold text-lg block">TikTok follow</span>
+                            <span class="text-xs text-gray-500 status-text">Click to open</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-lock text-gray-500 group-hover:text-white transition-colors icon-status"></i>
+                </button>
+
+                <!-- YouTube -->
+                <button onclick="handleLinkClick('youtube')" id="btn-youtube" class="social-btn btn-youtube glass-card w-full flex items-center justify-between p-4 rounded-xl group hover:bg-white/5 fade-in-up delay-300 text-left">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center text-[#FF0000]">
+                            <i class="fa-brands fa-youtube text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-semibold text-lg block">YouTube</span>
+                            <span class="text-xs text-gray-500 status-text">Click to open</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-lock text-gray-500 group-hover:text-white transition-colors icon-status"></i>
+                </button>
+
+                <!-- WhatsApp -->
+                <button onclick="handleLinkClick('whatsapp')" id="btn-whatsapp" class="social-btn btn-whatsapp glass-card w-full flex items-center justify-between p-4 rounded-xl group hover:bg-white/5 fade-in-up delay-400 text-left">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center text-[#25D366]">
+                            <i class="fa-brands fa-whatsapp text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-semibold text-lg block">WhatsApp Channel</span>
+                            <span class="text-xs text-gray-500 status-text">Click to open</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-lock text-gray-500 group-hover:text-white transition-colors icon-status"></i>
+                </button>
+
+            </div>
+
+            <!-- Banner Link Section -->
+            <div id="bannerSection" class="w-full mt-8 fade-in-up delay-500">
+                <div id="lockedBanner" class="locked-banner rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-3">
+                        <i class="fa-solid fa-lock text-3xl text-red-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">PANEL HAVE LOCKED🔐</h3>
+                    <p class="text-gray-400 text-sm">Complete all 3 tasks above to unlock</p>
+                    <div class="mt-4 flex justify-center gap-1">
+                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                    </div>
+                </div>
+
+                <button onclick="showUnlockModal()" id="unlockedBanner" class="hidden unlocked-banner w-full rounded-2xl p-6 text-center group cursor-pointer">
+                    <div class="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-gift text-3xl text-green-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-green-400">YOUR LINK IS UNLOCKED🔓!</h3>
+                    <p class="text-gray-300 text-sm">Click to claim your reward</p>
+                    <div class="mt-4">
+                        <span class="inline-flex items-center gap-2 text-green-400 font-semibold">
+                            Click to Open <i class="fa-solid fa-arrow-right"></i>
+                        </span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-10 text-xs text-gray-600 font-light">
+                &copy; 2026 Praince Gamer. All rights reserved.
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ==================== FIREBASE CONFIGURATION ====================
+        // Replace with your Firebase config from Firebase Console
+        const firebaseConfig = {
+  apiKey: "AIzaSyDOhlbhL1hFtmgFUVEir7xKPd2E11DFRk0",
+  authDomain: "website-98090.firebaseapp.com",
+  databaseURL: "https://website-98090-default-rtdb.firebaseio.com",
+  projectId: "website-98090",
+  storageBucket: "website-98090.firebasestorage.app",
+  messagingSenderId: "870091636077",
+  appId: "1:870091636077:web:148a9c1d91fec3fa756e64",
+  measurementId: "G-PHY8ZTL3RX"
+};
+
+        // Initialize Firebase
+        let database;
+        let isConnected = false;
+
+        function initFirebase() {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                isConnected = true;
+                updateConnectionStatus(true);
+                loadLinks();
+                trackVisit();
+            } catch (error) {
+                console.error("Firebase init error:", error);
+                updateConnectionStatus(false);
+                // Load defaults if Firebase fails
+                loadDefaultLinks();
+            }
+        }
+
+        // ==================== DATA STRUCTURE ====================
+        let links = {
+            tiktok: 'https://www.tiktok.com/@mrpraince444',
+            youtube: 'https://youtube.com/@praincegamer',
+            whatsapp: 'https://whatsapp.com/channel/0029Vb5j1Ic96H4Rr6ZHs72Y',
+            special: 'https://example.com/reward'
+        };
+
+        let completedTasks = {
+            tiktok: false,
+            youtube: false,
+            whatsapp: false
+        };
+
+        let currentLink = null;
+
+        // ==================== ADMIN FUNCTIONS ====================
+        const ADMIN_PASSWORD = 'Hasnain444';
+
+        function showAdminLogin() {
+            document.getElementById('adminLoginModal').classList.remove('hidden');
+            document.getElementById('adminLoginModal').classList.add('flex');
+        }
+
+        function closeAdminLogin() {
+            document.getElementById('adminLoginModal').classList.add('hidden');
+            document.getElementById('adminLoginModal').classList.remove('flex');
+        }
+
+        function verifyAdmin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                closeAdminLogin();
+                showAdminPanel();
+                document.getElementById('adminPassword').value = '';
+            } else {
+                alert('Incorrect password!');
+            }
+        }
+
+        function showAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'block';
+            // Populate fields
+            document.getElementById('adminTiktok').value = links.tiktok;
+            document.getElementById('adminYoutube').value = links.youtube;
+            document.getElementById('adminWhatsapp').value = links.whatsapp;
+            document.getElementById('adminSpecial').value = links.special;
+            loadAnalytics();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        function saveLinks() {
+            if (!isConnected) {
+                alert('Not connected to Firebase!');
+                return;
+            }
+
+            const newLinks = {
+                tiktok: document.getElementById('adminTiktok').value,
+                youtube: document.getElementById('adminYoutube').value,
+                whatsapp: document.getElementById('adminWhatsapp').value,
+                special: document.getElementById('adminSpecial').value,
+                updatedAt: new Date().toISOString()
+            };
+
+            database.ref('links').set(newLinks)
+                .then(() => {
+                    links = { ...links, ...newLinks };
+                    alert('Links saved successfully!');
+                    updateSyncIndicator('synced');
+                })
+                .catch(error => {
+                    alert('Error saving: ' + error.message);
+                    updateSyncIndicator('error');
+                });
+        }
+
+        function loadLinks() {
+            if (!isConnected) return;
+
+            updateSyncIndicator('syncing');
+            
+            database.ref('links').once('value')
+                .then(snapshot => {
+                    const data = snapshot.val();
+                    if (data) {
+                        links = { ...links, ...data };
+                    }
+                    updateSyncIndicator('synced');
+                })
+                .catch(error => {
+                    console.error('Load error:', error);
+                    updateSyncIndicator('error');
+                });
+        }
+
+        function loadDefaultLinks() {
+            // Default links if Firebase not available
+            links = {
+                tiktok: 'https://www.tiktok.com/@mrpraince444?_r=1&_t=ZS-94PV8zs4fLw',
+                youtube: 'https://youtube.com/@praincegamer?si=6q5U6WmW9ko90Ozt',
+                whatsapp: 'https://whatsapp.com/channel/0029Vb5j1Ic96H4Rr6ZHs72Y',
+                special: 'https://example.com/special-reward'
+            };
+        }
+
+        function testConnection() {
+            updateSyncIndicator('syncing');
+            database.ref('.info/connected').once('value')
+                .then(snap => {
+                    const connected = snap.val();
+                    updateConnectionStatus(connected);
+                    if (connected) {
+                        alert('Connected to Firebase!');
+                        loadLinks();
+                    } else {
+                        alert('Not connected!');
+                    }
+                });
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('firebaseStatus');
+            if (connected) {
+                statusEl.className = 'link-status status-online';
+                statusEl.innerHTML = '<i class="fa-solid fa-circle text-[8px]"></i> Connected';
+            } else {
+                statusEl.className = 'link-status status-offline';
+                statusEl.innerHTML = '<i class="fa-solid fa-circle text-[8px]"></i> Disconnected';
+            }
+        }
+
+        function updateSyncIndicator(status) {
+            const indicator = document.getElementById('syncIndicator');
+            if (status === 'syncing') {
+                indicator.className = 'sync-indicator syncing';
+                indicator.innerHTML = '<i class="fa-solid fa-rotate mr-2"></i>Syncing...';
+            } else if (status === 'synced') {
+                indicator.className = 'sync-indicator synced';
+                indicator.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Online';
+            } else if (status === 'error') {
+                indicator.className = 'sync-indicator error';
+                indicator.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i>Error';
+            }
+        }
+
+        // ==================== ANALYTICS ====================
+        function trackVisit() {
+            if (!isConnected) return;
+            
+            const visitRef = database.ref('analytics/visits');
+            visitRef.transaction(current => (current || 0) + 1);
+        }
+
+        function trackTaskCompletion() {
+            if (!isConnected) return;
+            
+            const taskRef = database.ref('analytics/completedTasks');
+            taskRef.transaction(current => (current || 0) + 1);
+        }
+
+        function loadAnalytics() {
+            if (!isConnected) return;
+
+            database.ref('analytics').once('value')
+                .then(snapshot => {
+                    const data = snapshot.val() || {};
+                    document.getElementById('totalVisits').textContent = data.visits || 0;
+                    document.getElementById('completedTasks').textContent = data.completedTasks || 0;
+                });
+        }
+
+        function resetAllData() {
+            if (!confirm('Are you sure? This will reset all analytics!')) return;
+            
+            if (isConnected) {
+                database.ref('analytics').set({
+                    visits: 0,
+                    completedTasks: 0
+                }).then(() => {
+                    alert('Data reset!');
+                    loadAnalytics();
+                });
+            }
+        }
+
+        // ==================== USER FUNCTIONS ====================
+        function handleLinkClick(platform) {
+            if (completedTasks[platform]) {
+                window.open(links[platform], '_blank');
+                return;
+            }
+
+            currentLink = platform;
+            window.open(links[platform], '_blank');
+            showLoadingModal();
+        }
+
+        function showLoadingModal() {
+            const modal = document.getElementById('loadingModal');
+            const progressFill = document.getElementById('progressFill');
+            const loadingText = document.getElementById('loadingText');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 1.67;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        closeLoadingModal();
+                        completeTask(currentLink);
+                    }, 200);
+                }
+                progressFill.style.width = progress + '%';
+                loadingText.textContent = Math.floor(progress) + '%';
+            }, 50);
+        }
+
+        function closeLoadingModal() {
+            const modal = document.getElementById('loadingModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('progressFill').style.width = '0%';
+        }
+
+        function completeTask(platform) {
+            completedTasks[platform] = true;
+            trackTaskCompletion();
+            
+            const btn = document.getElementById('btn-' + platform);
+            btn.classList.add('completed');
+            
+            const icon = btn.querySelector('.icon-status');
+            icon.classList.remove('fa-lock', 'text-gray-500');
+            icon.classList.add('fa-check', 'text-green-500');
+            
+            const statusText = btn.querySelector('.status-text');
+            statusText.textContent = 'Completed ✓';
+            statusText.classList.add('text-green-500');
+            
+            updateProgress();
+            showSuccessModal();
+            
+            if (allTasksCompleted()) {
+                setTimeout(() => {
+                    unlockBanner();
+                }, 500);
+            }
+        }
+
+        function allTasksCompleted() {
+            return completedTasks.tiktok && completedTasks.youtube && completedTasks.whatsapp;
+        }
+
+        function updateProgress() {
+            const completed = Object.values(completedTasks).filter(v => v).length;
+            const total = Object.keys(completedTasks).length;
+            const percentage = (completed / total) * 100;
+            
+            document.getElementById('progressCount').textContent = `${completed}/${total}`;
+            document.getElementById('mainProgress').style.width = percentage + '%';
+        }
+
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function unlockBanner() {
+            document.getElementById('lockedBanner').classList.add('hidden');
+            document.getElementById('unlockedBanner').classList.remove('hidden');
+            createConfetti();
+        }
+
+        function createConfetti() {
+            const colors = ['#ff0050', '#ff0000', '#25D366', '#3b82f6', '#fbbf24'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-10px';
+                    confetti.style.borderRadius = '50%';
+                    document.body.appendChild(confetti);
+                    
+                    const animation = confetti.animate([
+                        { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                        { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                    ], {
+                        duration: 2000 + Math.random() * 2000,
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    });
+                    
+                    animation.onfinish = () => confetti.remove();
+                }, i * 30);
+            }
+        }
+
+        function showUnlockModal() {
+            const modal = document.getElementById('unlockModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeUnlockModal() {
+            const modal = document.getElementById('unlockModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            window.open(links.special, '_blank');
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            initFirebase();
+            updateProgress();
+        });
+    </script>
+</body>
+</html>
